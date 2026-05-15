@@ -1,65 +1,180 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+
+const ROWS = 6;
+const COLS = 7;
+
+type Player = '🔴' | '🟡' | null;
+
+export default function Page() {
+  const createBoard = () =>
+    Array.from({ length: ROWS }, () =>
+      Array.from({ length: COLS }, () => null as Player)
+    );
+
+  const [board, setBoard] = useState(createBoard());
+  const [currentPlayer, setCurrentPlayer] = useState<Player>('🔴');
+  const [winner, setWinner] = useState<Player>(null);
+  const [isDraw, setIsDraw] = useState(false);
+
+  // Reiniciar juego
+  const resetGame = () => {
+    setBoard(createBoard());
+    setCurrentPlayer('🔴');
+    setWinner(null);
+    setIsDraw(false);
+  };
+
+  // Verificar ganador
+  const checkWinner = (newBoard: Player[][]) => {
+    // Horizontal
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS - 3; col++) {
+        const cell = newBoard[row][col];
+
+        if (
+          cell &&
+          cell === newBoard[row][col + 1] &&
+          cell === newBoard[row][col + 2] &&
+          cell === newBoard[row][col + 3]
+        ) {
+          return cell;
+        }
+      }
+    }
+
+    // Vertical
+    for (let row = 0; row < ROWS - 3; row++) {
+      for (let col = 0; col < COLS; col++) {
+        const cell = newBoard[row][col];
+
+        if (
+          cell &&
+          cell === newBoard[row + 1][col] &&
+          cell === newBoard[row + 2][col] &&
+          cell === newBoard[row + 3][col]
+        ) {
+          return cell;
+        }
+      }
+    }
+
+    // Diagonal ↘
+    for (let row = 0; row < ROWS - 3; row++) {
+      for (let col = 0; col < COLS - 3; col++) {
+        const cell = newBoard[row][col];
+
+        if (
+          cell &&
+          cell === newBoard[row + 1][col + 1] &&
+          cell === newBoard[row + 2][col + 2] &&
+          cell === newBoard[row + 3][col + 3]
+        ) {
+          return cell;
+        }
+      }
+    }
+
+    // Diagonal ↗
+    for (let row = 3; row < ROWS; row++) {
+      for (let col = 0; col < COLS - 3; col++) {
+        const cell = newBoard[row][col];
+
+        if (
+          cell &&
+          cell === newBoard[row - 1][col + 1] &&
+          cell === newBoard[row - 2][col + 2] &&
+          cell === newBoard[row - 3][col + 3]
+        ) {
+          return cell;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  // Insertar ficha
+  const dropPiece = (col: number) => {
+    if (winner || isDraw) return;
+
+    const newBoard = board.map((row) => [...row]);
+
+    for (let row = ROWS - 1; row >= 0; row--) {
+      if (!newBoard[row][col]) {
+        newBoard[row][col] = currentPlayer;
+
+        const gameWinner = checkWinner(newBoard);
+
+        setBoard(newBoard);
+
+        if (gameWinner) {
+          setWinner(gameWinner);
+        } else {
+          const full = newBoard.every((row) =>
+            row.every((cell) => cell !== null)
+          );
+
+          if (full) {
+            setIsDraw(true);
+          } else {
+            setCurrentPlayer(currentPlayer === '🔴' ? '🟡' : '🔴');
+          }
+        }
+
+        return;
+      }
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-white">
+      <h1 className="text-5xl font-bold mb-4">Connect 4</h1>
+
+      <div className="mb-6 text-2xl font-semibold">
+        {winner
+          ? `Ganador: ${winner}`
+          : isDraw
+          ? 'Empate'
+          : `Turno: ${currentPlayer}`}
+      </div>
+
+      {/* Botones de columnas */}
+      <div className="grid grid-cols-7 gap-2 mb-2">
+        {Array.from({ length: COLS }).map((_, col) => (
+          <button
+            key={col}
+            onClick={() => dropPiece(col)}
+            className="bg-blue-500 hover:bg-blue-600 transition rounded-lg h-12 w-12 text-2xl font-bold"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            ↓
+          </button>
+        ))}
+      </div>
+
+      {/* Tablero */}
+      <div className="bg-blue-700 p-3 rounded-2xl shadow-2xl">
+        <div className="grid grid-cols-7 gap-2">
+          {board.map((row, rowIndex) =>
+            row.map((cell, colIndex) => (
+              <div
+                key={`${rowIndex}-${colIndex}`}
+                className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center text-4xl border-2 border-blue-300"
+              >
+                {cell}
+              </div>
+            ))
+          )}
         </div>
-      </main>
-    </div>
+      </div>
+
+      <button
+        onClick={resetGame}
+        className="mt-6 px-6 py-3 bg-green-500 hover:bg-green-600 rounded-xl text-xl font-bold transition"
+      >
+        Reiniciar
+      </button>
+    </main>
   );
 }
