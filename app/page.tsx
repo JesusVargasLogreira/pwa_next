@@ -129,24 +129,29 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-white">
-      <h1 className="text-5xl font-bold mb-4">Connect 4</h1>
+    <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 text-white overflow-x-hidden">
+      <h1 className="text-3xl sm:text-5xl font-bold mb-4 text-center">Connect 4</h1>
 
-      <div className="mb-6 text-2xl font-semibold">
+      <div className="mb-6 text-lg sm:text-2xl font-semibold text-center">
         {winner
           ? `Ganador: ${winner}`
           : isDraw
-          ? 'Empate'
-          : `Turno: ${currentPlayer}`}
+            ? 'Empate'
+            : `Turno: ${currentPlayer}`}
       </div>
 
       {/* Botones de columnas */}
-      <div className="grid grid-cols-7 gap-2 mb-2">
+      <div
+        className="grid grid-cols-7 gap-1 sm:gap-2 mb-2"
+        style={{
+          width: "min(95vw, 520px)",
+        }}
+      >
         {Array.from({ length: COLS }).map((_, col) => (
           <button
             key={col}
             onClick={() => dropPiece(col)}
-            className="bg-blue-500 hover:bg-blue-600 transition rounded-lg h-12 w-12 text-2xl font-bold"
+            className="bg-blue-500 hover:bg-blue-600 transition rounded-lg aspect-square w-full text-lg sm:text-2xl font-bold"
           >
             ↓
           </button>
@@ -154,13 +159,18 @@ export default function Page() {
       </div>
 
       {/* Tablero */}
-      <div className="bg-blue-700 p-3 rounded-2xl shadow-2xl">
-        <div className="grid grid-cols-7 gap-2">
+      <div
+        className="bg-blue-700 p-2 sm:p-3 rounded-2xl shadow-2xl"
+        style={{
+          width: "min(95vw, 560px)",
+        }}
+      >
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {board.map((row, rowIndex) =>
             row.map((cell, colIndex) => (
               <div
                 key={`${rowIndex}-${colIndex}`}
-                className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center text-4xl border-2 border-blue-300"
+                className="aspect-square w-full bg-slate-800 rounded-full flex items-center justify-center text-xl sm:text-4xl border-2 border-blue-300"
               >
                 {cell}
               </div>
@@ -171,7 +181,7 @@ export default function Page() {
 
       <button
         onClick={resetGame}
-        className="mt-6 px-6 py-3 bg-green-500 hover:bg-green-600 rounded-xl text-xl font-bold transition"
+        className="mt-6 px-5 py-3 bg-green-500 hover:bg-green-600 rounded-xl text-base sm:text-xl font-bold transition w-full max-w-xs"
       >
         Reiniciar
       </button>

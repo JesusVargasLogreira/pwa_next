@@ -5,13 +5,6 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +12,69 @@
   }
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Layout navbar */
+.layout {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+.botones div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.botonLayout {
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  cursor: pointer;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.uno {
+  background-color: #007bff;
+}
+
+.uno:hover {
+  background: #0b7dda;
+}
+
+.dos {
+  background-color: #e7e7e7;
+  color: black;
+}
+
+.dos:hover {
+  background: #ddd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .botonLayout {
+    width: 100%;
+    max-width: 240px;
+  }
 }
